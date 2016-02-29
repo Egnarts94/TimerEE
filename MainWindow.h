@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QProcess>
+#include <QFile>
+#include <QTextStream>
 
 namespace Ui {
 class CMainWindow;
@@ -18,6 +20,7 @@ public:
   ~CMainWindow();
   int secToMin(int sec);
   int minToSec(int min);
+  int hourToSec(int hour);
 
 private:
   Ui::CMainWindow *ui;
@@ -28,9 +31,11 @@ private:
   QProcess m_executeProgram;
 
   void connectSignals();
+  void readPathsFile();
   int getPercentageProgress();
   void startTimer();
   void stopTimer(bool finished = false);
+  void refreshRemainSeconds();
 
 public slots:
   void on_action_Close_triggered();
@@ -39,6 +44,9 @@ public slots:
   void executeCommand();
   void processClickedButton();
   void processPauseButton(bool pressed);
+  void processSecValueChanged(int value);
+  void processMinValueChanged(int value);
+  void processHourValueChanged(int value);
 };
 
 #endif // MAINWINDOW_H

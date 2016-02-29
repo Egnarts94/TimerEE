@@ -23,3 +23,6 @@ FORMS    += MainWindow.ui \
     AboutDialog.ui
 
 RC_FILE = timerEE.rc
+
+DISTFILES += \
+    paths.txt
