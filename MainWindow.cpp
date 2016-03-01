@@ -12,7 +12,7 @@ CMainWindow::CMainWindow(QWidget *parent)
 {
   m_state = false;
   mp_timer = new QTimer();
-  mp_timer->setTimerType(Qt::VeryCoarseTimer);
+  mp_timer->setTimerType(Qt::PreciseTimer);
 
   ui->setupUi(this);
   ui->pauseButton->hide();
@@ -89,6 +89,20 @@ void CMainWindow::showState()
   ui->remainTimeShow->setText(QString("%1 sek").arg(m_remainingSec));
   ui->progressBar->setValue(getPercentageProgress());
   ui->progressBar->setToolTip(QString("%1 Minuten verbleibend").arg(secToMin(m_remainingSec)));
+  if (m_remainingSec == 60) {
+    if (ui->notificateCheckBox->isChecked()) {
+      QSystemTrayIcon trayIcon;
+      if (trayIcon.isSystemTrayAvailable() && trayIcon.supportsMessages()) {
+        trayIcon.show();
+        trayIcon.showMessage("TimerEE - Benachrichtigung",
+                         QString("Die Zeit bis zur Ausführung der Aktion \"%1\" beträgt weniger als 1 Minute").arg(ui->pathBox->currentText()),
+                         QSystemTrayIcon::Information,
+                         5000
+                         );
+        trayIcon.hide();
+      }
+    }
+  }
   if (m_remainingSec <= 0) {
     executeCommand();
   }
@@ -116,6 +130,7 @@ void CMainWindow::startTimer()
   ui->hourBox->setEnabled(false);
   ui->minBox->setEnabled(false);
   ui->secBox->setEnabled(false);
+  ui->notificateCheckBox->setEnabled(false);
   m_secToRun = ui->secBox->value();
   m_secToRun += minToSec(ui->minBox->value());
   m_secToRun += hourToSec(ui->hourBox->value());
@@ -139,6 +154,7 @@ void CMainWindow::stopTimer(bool finished)
   ui->hourBox->setEnabled(true);
   ui->minBox->setEnabled(true);
   ui->secBox->setEnabled(true);
+  ui->notificateCheckBox->setEnabled(true);
   ui->pauseButton->hide();
   if (!finished) {
     ui->progressBar->setValue(0);
@@ -168,11 +184,13 @@ void CMainWindow::processPauseButton(bool pressed)
   if (pressed) {
     mp_timer->stop();
     ui->pathBox->setEnabled(true);
+    ui->notificateCheckBox->setEnabled(true);
     ui->pauseButton->setText("Fortsetzen");
   }
   else {
     mp_timer->start(1000);
     ui->pathBox->setEnabled(false);
+    ui->notificateCheckBox->setEnabled(false);
     ui->pauseButton->setText("Pause");
   }
 }// processPauseButton(bool pressed)

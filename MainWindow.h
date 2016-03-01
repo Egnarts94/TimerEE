@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QFile>
 #include <QTextStream>
+#include <QSystemTrayIcon>
 
 namespace Ui {
 class CMainWindow;
